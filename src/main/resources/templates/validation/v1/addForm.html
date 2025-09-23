@@ -6,7 +6,10 @@
           href="../css/bootstrap.min.css" rel="stylesheet">
     <style>
         .container {
-            max-width: 560px;
+        max-width: 560px;
+        } .field-error {
+        border-color: #dc3545;
+        color: #dc3545;
         }
     </style>
 </head>
@@ -19,17 +22,46 @@
     </div>
 
     <form action="item.html" th:action th:object="${item}" method="post">
+
+        <div th:if="${errors?.containsKey('globalError')}">
+            <p class="field-error" th:text="${errors['globalError']}">전체 오류 메세지</p>
+        </div>
+
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
-            <input type="text" id="itemName" th:field="*{itemName}" class="form-control" placeholder="이름을 입력하세요">
+            <!--/*
+            1.자바의 조건식과 유사하다
+            th:() = "${(여기가 참이라면)?(실행):(참이아닐떄 실행)}"
+            3. Safe Navigation Operator
+            만약 여기에서 errors 가 null 이라면 ?
+            처음에 addForm 에 들어가자 마자 제출을 하면 errors 가 null 이 된다
+            errors? 에 .containsKey('...') 를해주면 NullPointerException 이 발생하는 대신에
+            null을 반환한다 .th 조건 속성에서는 null이면 실패로 처리된다
+            */-->
+            <input type="text" id="itemName" th:field="*{itemName}"
+                   th:class="${errors?.containsKey('itemName')} ? 'form-control field-error': 'form-control'"
+                   class="form-control" placeholder="이름을 입력하세요">
+            <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">
+                상품명 오류
+            </div>
         </div>
         <div>
             <label for="price" th:text="#{label.item.price}">가격</label>
-            <input type="text" id="price" th:field="*{price}" class="form-control" placeholder="가격을 입력하세요">
+            <input type="text" id="price" th:field="*{price}"
+                   th:class="${errors?.containsKey('price')} ? 'form-control field-error': 'form-control'"
+                   class="form-control" placeholder="가격을 입력하세요">
+            <div class="field-error" th:if="${errors?.containsKey('price')}" th:text="${errors['price']}">
+                가격 오류
+            </div>
         </div>
         <div>
             <label for="quantity" th:text="#{label.item.quantity}">수량</label>
-            <input type="text" id="quantity" th:field="*{quantity}" class="form-control" placeholder="수량을 입력하세요">
+            <input type="text" id="quantity" th:field="*{quantity}"
+                   th:class="${errors?.containsKey('quantity')} ? 'form-control field-error': 'form-control'"
+                   class="form-control" placeholder="수량을 입력하세요">
+            <div class="field-error" th:if="${errors?.containsKey('quantity')}" th:text="${errors['quantity']}">
+                수량 오류
+            </div>
         </div>
 
         <hr class="my-4">
@@ -51,3 +83,11 @@
 </div> <!-- /container -->
 </body>
 </html>
+<!--/*
+(Thymeleaf) → 템플릿 엔진
+데이터를 받아서 HTML을 동적으로 생성해주는 역할
+${}, th:text, th:each 같은 문법 제공
+타임리프로 작성한 HTML 파일 → 뷰 템플릿
+화면 설계 + 동적 데이터 표현을 담은 설계도
+컨트롤러에서 모델 데이터를 넘겨주면 최종 HTML 완성
+*/-->
