@@ -28,28 +28,27 @@
         </div>
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
+            <!--th:field 에 있는 price 를 가지고 bindingResult 에 오류가 있는지 없는지를 찾는다
+             오류가 있다면 th:errorclass 와 class="form-control"와 class="form-control" 를 랜더링한다
+            -->
             <input type="text" id="itemName" th:field="*{itemName}"
                    th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요">
-                   class="form-control" placeholder="이름을 입력하세요">
-            <div class="field-error" th:error="*{itemName}">
-                상품명 오류
-            </div>
+            <!--error 태그 , bindingResult 에서 itemName 에서 오류가 있다면 -->
+            <div class="field-error" th:errors="*{itemName}"> 상품명 오류</div>
         </div>
         <div>
             <label for="price" th:text="#{label.item.price}">가격</label>
             <input type="text" id="price" th:field="*{price}"
-                   th:class="${errors?.containsKey('price')} ? 'form-control field-error': 'form-control'"
-                   class="form-control" placeholder="가격을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('price')}" th:text="${errors['price']}">
+                   th:errorclass="field-error" class="form-control" placeholder="가격을 입력하세요">
+            <div class="field-error" th:errors="*{price}">
                 가격 오류
             </div>
         </div>
         <div>
             <label for="quantity" th:text="#{label.item.quantity}">수량</label>
             <input type="text" id="quantity" th:field="*{quantity}"
-                   th:class="${errors?.containsKey('quantity')} ? 'form-control field-error': 'form-control'"
-                   class="form-control" placeholder="수량을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('quantity')}" th:text="${errors['quantity']}">
+                   th:errorclass="field-error" class="form-control" placeholder="수량을 입력하세요">
+            <div class="field-error" th:errors="*{price}">
                 수량 오류
             </div>
         </div>
