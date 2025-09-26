@@ -32,6 +32,8 @@
             <!--/*
             1.자바의 조건식과 유사하다
             th:() = "${(여기가 참이라면)?(실행):(참이아닐떄 실행)}"
+            2. th:class="${errors?.containsKey('itemName')} ? 'form-control field-error': 'form-control'" class="form-control"
+            'form-control field-error' → 공백 하나로 두 클래스가 동시에 적용된다
             3. Safe Navigation Operator
             만약 여기에서 errors 가 null 이라면 ?
             처음에 addForm 에 들어가자 마자 제출을 하면 errors 가 null 이 된다
@@ -41,6 +43,7 @@
             <input type="text" id="itemName" th:field="*{itemName}"
                    th:class="${errors?.containsKey('itemName')} ? 'form-control field-error': 'form-control'"
                    class="form-control" placeholder="이름을 입력하세요">
+            <!--th 조건문, 만약 itemName 이 포함하는 경우 itemName 의 에러를 출력한다-->
             <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">
                 상품명 오류
             </div>
@@ -73,7 +76,7 @@
             <div class="col">
                 <button class="w-100 btn btn-secondary btn-lg"
                         onclick="location.href='items.html'"
-                        th:onclick="|location.href='@{/validation/v1/items}'|"
+                        th:onclick="|location.href='@{/validation/v2/items}'|"
                         type="button" th:text="#{button.cancel}">취소</button>
             </div>
         </div>
