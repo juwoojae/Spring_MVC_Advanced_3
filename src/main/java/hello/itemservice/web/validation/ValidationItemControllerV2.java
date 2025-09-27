@@ -170,7 +170,9 @@ public class ValidationItemControllerV2 {
     }
 
     /**
-     * BindingResult 가 제공하는 rejectValue(), reject() 를 사용하면 FieldError, ObjectError 를 직접 생성하지 않고, 깔끔하게 검증 오류를 다룰 수 있다
+     * BindingResult 가 제공하는 rejectValue(), reject() 를 사용하면 FieldError, ObjectError 의 인스턴스를 생성하고 생성자 그 수많은 파라메터를 안넣어도 된다
+     * FieldError, ObjectError 는  String[] codes 에 오류 코드를 다 추가해줘야하지만 rejectValue,reject 는 MessageCodesResolver 를 제공하므로
+     * 오류코드를 알아서 생성후 추가해준다
      */
     @PostMapping("/add")
     public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
