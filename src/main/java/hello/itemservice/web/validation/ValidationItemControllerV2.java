@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -170,19 +171,27 @@ public class ValidationItemControllerV2 {
     }
 
     /**
-     * BindingResult 가 제공하는 rejectValue(), reject() 를 사용하면 FieldError, ObjectError 의 인스턴스를 생성하고 생성자 그 수많은 파라메터를 안넣어도 된다
-     * FieldError, ObjectError 는  String[] codes 에 오류 코드를 다 추가해줘야하지만 rejectValue,reject 는 MessageCodesResolver 를 제공하므로
-     * 오류코드를 알아서 생성후 추가해준다
+     * 1. rejectValue() 호출
+     * 2. MessageCodesResolver 를 사용해서 검증 오류 코드로 메세지 코드들을 생성
+     * 3. new FieldError() 를 생성 하면서 메세지 코드들을 보관
+     * 4. th:error 에서 메세지 코드들로 메세지를 순서대로 메시지에서 찾고, 노출
      */
+
     @PostMapping("/add")
     public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         //Object 의 Name 은 이미 bindingResult 가 알고 있다
         log.info("objectName={}", bindingResult.getObjectName());
         log.info("target={}", bindingResult.getTarget());
 
-        if (!StringUtils.hasText(item.getItemName())) {
-            bindingResult.rejectValue("itemName", "required");
-        }
+//        if (!StringUtils.hasText(item.getItemName())) {
+//            bindingResult.rejectValue("itemName", "required");
+//        }
+        /**
+         * ValidationUtils 위의 주석코드와 동일하다
+         * 다음과 같이 한줄로 가능하고, Empty , 공백 같은 단순한 기능만 제공한다
+         */
+        ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
+
         if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
             bindingResult.rejectValue("price","range", new Object[]{1000,1000000},null);
         }
