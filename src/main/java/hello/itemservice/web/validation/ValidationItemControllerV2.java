@@ -57,9 +57,9 @@ public class ValidationItemControllerV2 {
      *
      *
      */
-//    @PostMapping("/add")
-    public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        Item savedItem = itemRepository.save(item);
+//    @PostMapping("/add") //BindingResult 의 위치는 @ModelAttribute 의 바로 뒤에 와야 한다. 이 객체가 타당한지 판단해야 한다
+    public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
 
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
@@ -86,6 +86,7 @@ public class ValidationItemControllerV2 {
             return "validation/v2/addForm";
         }
         //성공 로직
+        Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v2/items/{itemId}";
@@ -97,11 +98,10 @@ public class ValidationItemControllerV2 {
      * 			            @Nullable String[] codes, @Nullable Object[] arguments, @Nullable String defaultMessage)
      * 사용자의 입력 데이터가 컨트롤러에 @ModelAttribute 에 바인딩 되는 시점에 오류가 발생하면, 모델 객체에 사용자 입력 값을
      * 유지하기 어렵다. 별도로 보관하기위해서 FieldError 가 파라메터로 받아서 유지한다
+     *
      */
-    @PostMapping("/add")
-    public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        Item savedItem = itemRepository.save(item);
-
+    //@PostMapping("/add")
+    public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
@@ -127,17 +127,19 @@ public class ValidationItemControllerV2 {
             return "validation/v2/addForm";
         }
         //성공 로직
+        Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v2/items/{itemId}";
     }
     //@PostMapping("/add")
-    public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        Item savedItem = itemRepository.save(item);
+    public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
 
         if (!StringUtils.hasText(item.getItemName())) {
-            bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, new String[]{"required.item.itemName","required.default "},null,null));
+            bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, new String[]{"required.item.itemName"},null,null));
         }
         if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
             bindingResult.addError(new FieldError("item",  "price", item.getPrice(), false, new String[]{"range.item.price"}, new Object[]{1000, 1000000}, null));
@@ -160,8 +162,50 @@ public class ValidationItemControllerV2 {
             return "validation/v2/addForm";
         }
         //성공 로직
+        Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
+
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    /**
+     * BindingResult 가 제공하는 rejectValue(), reject() 를 사용하면 FieldError, ObjectError 를 직접 생성하지 않고, 깔끔하게 검증 오류를 다룰 수 있다
+     */
+    @PostMapping("/add")
+    public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        //Object 의 Name 은 이미 bindingResult 가 알고 있다
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
+
+        if (!StringUtils.hasText(item.getItemName())) {
+            bindingResult.rejectValue("itemName", "required");
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.rejectValue("price","range", new Object[]{1000,1000000},null);
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.rejectValue("quantity","max",new Object[]{9999},null);
+        }
+
+        //특정 필드가 아님 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPrinceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        //오류를 가지고 있다면
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult);
+            return "validation/v2/addForm";
+        }
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
         return "redirect:/validation/v2/items/{itemId}";
     }
     @GetMapping("/{itemId}/edit")
