@@ -12,6 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -26,6 +28,12 @@ import java.util.Map;
 public class ValidationItemControllerV2 {
 
     private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
+
+//    @InitBinder
+//    public void init(WebDataBinder dataBinder){
+//        dataBinder.addValidators(itemValidator);
+//    }
 
     @GetMapping
     public String items(Model model) {
@@ -177,7 +185,7 @@ public class ValidationItemControllerV2 {
      * 4. th:error 에서 메세지 코드들로 메세지를 순서대로 메시지에서 찾고, 노출
      */
 
-    @PostMapping("/add")
+   // @PostMapping("/add")
     public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         //Object 의 Name 은 이미 bindingResult 가 알고 있다
         log.info("objectName={}", bindingResult.getObjectName());
@@ -219,6 +227,47 @@ public class ValidationItemControllerV2 {
 
         return "redirect:/validation/v2/items/{itemId}";
     }
+
+    //@PostMapping("/add")
+    public String addItemV5(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+        //필드 멤버의 메서드로 validate 를 직접 실행 -> 오류검증시 bindingResult 에 넣기
+        itemValidator.validate(item, bindingResult);
+
+        //오류를 가지고 있다면
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult);
+            return "validation/v2/addForm";
+        }
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    /**
+     * Validated 는 검증기를 실행하라는 에노테이션
+     * 먼저 WebDataBinder 에 등록된 검증기를 찾아서 실행한다. 그런데 여러 검증기를 등록한다면, 그중에 어떤 검증기가 실행되어야 할지
+     * 구분이 필요하다. 이때 supports() 가 사용된다. 여기서는 support(Item.class) 호출해서  true 를 반환하면
+     * ItemValidator 의 validate() 를 호출한다
+     */
+    @PostMapping("/add")
+    public String addItemV6(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        //오류를 가지고 있다면
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult);
+            return "validation/v2/addForm";
+        }
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
