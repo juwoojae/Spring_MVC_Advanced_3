@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 /**
  * jakarta.validation 으로 시작하면 특정 구현에 관계 없이 제공되는 표준 인터페이스이고,
@@ -19,6 +20,7 @@ import org.hibernate.validator.constraints.Range;
  * 변환에 성공한 필드만 BeanValidation 적용
  * */
 @Data
+//@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >=10000")
 public class Item {
 
     private Long id;
