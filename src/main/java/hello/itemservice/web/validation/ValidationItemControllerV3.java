@@ -3,6 +3,8 @@ package hello.itemservice.web.validation;
 import ch.qos.logback.core.util.StringUtil;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
+import hello.itemservice.domain.item.SaveCheck;
+import hello.itemservice.domain.item.UpdateCheck;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -58,8 +60,31 @@ public class ValidationItemControllerV3 {
      * 이 오류 코드를 기반으로 MessageCodesResolver 를 통해 4가지 메세지 코드가 생성된다
      * 이것또한 errors 메세지로 등록해서 사용할수있다 {0} : 필드명, {1}.{2} ... 에노테이션마다 다르지만 , 대부분 range
      */
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        //특정 필드가 아님 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();  //가격 * 수량의 합은 10000원 이상이다
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        //오류를 가지고 있다면
+        if (bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult); // 그 오류들을 log 로 찍어보자
+            return "validation/v3/addForm";
+        }
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v3/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItem2(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         //특정 필드가 아님 복합 룰 검증
         if (item.getPrice() != null && item.getQuantity() != null) {
@@ -89,7 +114,7 @@ public class ValidationItemControllerV3 {
     }
 
 
-    @PostMapping("/{itemId}/edit")
+    //@PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, @Validated @ModelAttribute Item item,BindingResult bindingResult) {
 
         //특정 필드가 아님 복합 룰 검증
@@ -108,6 +133,27 @@ public class ValidationItemControllerV3 {
         itemRepository.update(itemId, item);
         return "redirect:/validation/v3/items/{itemId}";
     }
+
+    @PostMapping("/{itemId}/edit")
+    public String edit2(@PathVariable Long itemId, @Validated(UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult) {
+
+        //특정 필드가 아님 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();  //가격 * 수량의 합은 10000원 이상이다
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        //오류를 가지고 있다면
+        if (bindingResult.hasErrors()) {
+            log.info("editerrors = {} ", bindingResult); // 그 오류들을 log 로 찍어보자
+            return "validation/v3/editForm";
+        }
+        itemRepository.update(itemId, item);
+        return "redirect:/validation/v3/items/{itemId}";
+    }
+
 
 }
 
