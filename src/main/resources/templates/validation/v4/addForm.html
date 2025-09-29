@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+        max-width: 560px;
+        } .field-error {
+        border-color: #dc3545;
+        color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2 th:text="#{page.addItem}">상품 등록</h2>
+    </div>
+
+    <form action="item.html" th:action th:object="${item}" method="post">
+        <!--bindingResult 를 뷰 템플릿으로 가져오는 로직
+        타임 리프의 th:field 는 매우 똑똑하게 동작하는데, 정상 상황에는 모델 객체의 값사용.
+        오류가 발생하면, FieldError 에서 보관한 값을 사용.
+        -->
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메세지</p>
+        </div>
+        <div>
+            <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
+            <!--th:field 에 있는 price 를 가지고 bindingResult 에 오류가 있는지 없는지를 찾는다
+             오류가 있다면 th:errorclass 와 class="form-control"와 class="form-control" 를 랜더링한다
+            -->
+            <input type="text" id="itemName" th:field="*{itemName}"
+                   th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요">
+            <!--error 태그 , bindingResult 에서 itemName 에서 오류가 있다면 -->
+            <div class="field-error" th:errors="*{itemName}"> 상품명 오류</div>
+        </div>
+        <div>
+            <label for="price" th:text="#{label.item.price}">가격</label>
+            <input type="text" id="price" th:field="*{price}"
+                   th:errorclass="field-error" class="form-control" placeholder="가격을 입력하세요">
+            <div class="field-error" th:errors="*{price}">
+                가격 오류
+            </div>
+        </div>
+        <div>
+            <label for="quantity" th:text="#{label.item.quantity}">수량</label>
+            <input type="text" id="quantity" th:field="*{quantity}"
+                   th:errorclass="field-error" class="form-control" placeholder="수량을 입력하세요">
+            <div class="field-error" th:errors="*{quantity}">
+                수량 오류
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col">
+                <button class="w-100 btn btn-primary btn-lg" type="submit" th:text="#{button.save}">상품 등록</button>
+            </div>
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg"
+                        onclick="location.href='items.html'"
+                        th:onclick="|location.href='@{/validation/v4/items}'|"
+                        type="button" th:text="#{button.cancel}">취소
+                </button>
+            </div>
+        </div>
+
+    </form>
+
+</div> <!-- /container -->
+</body>
+</html>
+<!--/*
+(Thymeleaf) → 템플릿 엔진
+데이터를 받아서 HTML을 동적으로 생성해주는 역할
+${}, th:text, th:each 같은 문법 제공
+타임리프로 작성한 HTML 파일 → 뷰 템플릿
+화면 설계 + 동적 데이터 표현을 담은 설계도
+컨트롤러에서 모델 데이터를 넘겨주면 최종 HTML 완성
+*/-->
