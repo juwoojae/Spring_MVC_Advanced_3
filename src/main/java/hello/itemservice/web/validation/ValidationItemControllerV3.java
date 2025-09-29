@@ -49,7 +49,15 @@ public class ValidationItemControllerV3 {
         return "validation/v3/addForm";
     }
 
-
+    /**
+     * 1. LocalValidatorFactoryBean 은 글로벌 Validator 로 등록한다. 이 Validator 는 @NotNull 같은 에노테이션을 보고 검증을 수행한다
+     * 이렇게 글로벌 Validator 가 적용되어 있기 때문에 @Validated , @Valid 를 적용해서 검증 오류가 발생하면, FieldError, ObjectError 를
+     * 생성해서 BindingResult 에 담아 준다
+     * 2. Bean - Validation 에러 코드
+     * 오류 코드가 애노테이션 이름으로 자동으로 등록 된다. 마치 (typeMismatch 와 유사)
+     * 이 오류 코드를 기반으로 MessageCodesResolver 를 통해 4가지 메세지 코드가 생성된다
+     * 이것또한 errors 메세지로 등록해서 사용할수있다 {0} : 필드명, {1}.{2} ... 에노테이션마다 다르지만 , 대부분 range
+     */
     @PostMapping("/add")
     public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
@@ -62,13 +70,14 @@ public class ValidationItemControllerV3 {
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
-
+        System.out.println("이건");
         return "redirect:/validation/v3/items/{itemId}";
     }
 
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
+        System.out.println("ValidationItemControllerV3.editForm");
         model.addAttribute("item", item);
         return "validation/v3/editForm";
     }

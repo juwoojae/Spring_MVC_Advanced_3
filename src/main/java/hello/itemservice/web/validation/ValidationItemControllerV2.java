@@ -248,11 +248,6 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    /**
-     * LocalValidatorFactoryBean 은 글로벌 Validator 로 등록한다. 이 Validator 는 @NotNull 같은 에노테이션을 보고 검증을 수행한다
-     * 이렇게 글로벌 Validator 가 적용되어 있기 때문에 @Validated , @Valid 를 적용해서 검증 오류가 발생하면, FieldError, ObjectError 를
-     * 생성해서 BindingResult 에 담아 준다
-     */
     @PostMapping("/add")
     public String addItemV6(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
