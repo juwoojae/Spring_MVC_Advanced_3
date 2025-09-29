@@ -28,12 +28,6 @@ import java.util.Map;
 public class ValidationItemControllerV3 {
 
     private final ItemRepository itemRepository;
-    private final ItemValidator itemValidator;
-
-//    @InitBinder
-//    public void init(WebDataBinder dataBinder){
-//        dataBinder.addValidators(itemValidator);
-//    }
 
     @GetMapping
     public String items(Model model) {
@@ -57,11 +51,11 @@ public class ValidationItemControllerV3 {
 
 
     @PostMapping("/add")
-    public String addItemV6(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         //오류를 가지고 있다면
         if (bindingResult.hasErrors()) {
-            log.info("errors = {} ", bindingResult);
+            log.info("errors = {} ", bindingResult); // 그 오류들을 log 로 찍어보자
             return "validation/v3/addForm";
         }
         //성공 로직

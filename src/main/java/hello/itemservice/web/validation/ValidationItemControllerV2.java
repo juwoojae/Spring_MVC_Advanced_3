@@ -249,10 +249,9 @@ public class ValidationItemControllerV2 {
     }
 
     /**
-     * Validated 는 검증기를 실행하라는 에노테이션
-     * 먼저 WebDataBinder 에 등록된 검증기를 찾아서 실행한다. 그런데 여러 검증기를 등록한다면, 그중에 어떤 검증기가 실행되어야 할지
-     * 구분이 필요하다. 이때 supports() 가 사용된다. 여기서는 support(Item.class) 호출해서  true 를 반환하면
-     * ItemValidator 의 validate() 를 호출한다
+     * LocalValidatorFactoryBean 은 글로벌 Validator 로 등록한다. 이 Validator 는 @NotNull 같은 에노테이션을 보고 검증을 수행한다
+     * 이렇게 글로벌 Validator 가 적용되어 있기 때문에 @Validated , @Valid 를 적용해서 검증 오류가 발생하면, FieldError, ObjectError 를
+     * 생성해서 BindingResult 에 담아 준다
      */
     @PostMapping("/add")
     public String addItemV6(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
