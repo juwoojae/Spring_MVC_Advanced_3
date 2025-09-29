@@ -22,12 +22,6 @@
     </div>
 
     <form action="item.html" th:action th:object="${item}" method="post">
-        <!--bindingResult 를 뷰 템플릿으로 가져오는 로직
-        타임 리프의 th:field 는 매우 똑똑하게 동작하는데, 정상 상황에는 모델 객체의 값사용.
-        오류가 발생하면, FieldError 에서 보관한 값을 사용.
-        -->
-        <div th:if="${#fields.hasGlobalErrors()}">
-            <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메세지</p>
         </div>
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
@@ -50,8 +44,6 @@
         <div>
             <label for="quantity" th:text="#{label.item.quantity}">수량</label>
             <input type="text" id="quantity" th:field="*{quantity}"
-                   th:errorclass="field-error" class="form-control" placeholder="수량을 입력하세요">
-            <div class="field-error" th:errors="*{quantity}">
                 수량 오류
             </div>
         </div>
@@ -66,8 +58,6 @@
                 <button class="w-100 btn btn-secondary btn-lg"
                         onclick="location.href='items.html'"
                         th:onclick="|location.href='@{/validation/v3/items}'|"
-                        type="button" th:text="#{button.cancel}">취소
-                </button>
             </div>
         </div>
 

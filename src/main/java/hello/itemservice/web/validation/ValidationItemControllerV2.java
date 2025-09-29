@@ -230,7 +230,6 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-<<<<<<< Updated upstream
     //@PostMapping("/add")
     public String addItemV5(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         //필드 멤버의 메서드로 validate 를 직접 실행 -> 오류검증시 bindingResult 에 넣기
@@ -271,8 +270,6 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-=======
->>>>>>> Stashed changes
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
