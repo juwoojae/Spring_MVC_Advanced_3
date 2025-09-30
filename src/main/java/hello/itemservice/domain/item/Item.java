@@ -29,18 +29,17 @@ import org.hibernate.validator.constraints.ScriptAssert;
 //@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >=10000")
 public class Item {
 
-    @NotNull(groups = UpdateCheck.class)
+    // @NotNull(groups = UpdateCheck.class)
     private Long id;
 
-    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class}) //빈값 + 공백만 있는 경우를 허용하지 않는다
+    // @NotBlank(groups = {SaveCheck.class, UpdateCheck.class}) //빈값 + 공백만 있는 경우를 허용하지 않는다
     private String itemName;
 
-    @NotNull(groups = {SaveCheck.class, UpdateCheck.class}) //null 을 허용하지 않는다
-    @Range(min = 1000, max = 1000000, groups = {SaveCheck.class, UpdateCheck.class}) //100 ~ 1000000 범위 안의 값이어야 한다
+    // @NotNull(groups = {SaveCheck.class, UpdateCheck.class}) //null 을 허용하지 않는다
+    //@Range(min = 1000, max = 1000000, groups = {SaveCheck.class, UpdateCheck.class}) //100 ~ 1000000 범위 안의 값이어야 한다
     private Integer price;
 
-    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
-    @Max(value = 9999, groups = {SaveCheck.class}) //최대 9999 까지만 허용한다
+    //@NotNull(groups = {SaveCheck.class, UpdateCheck.class})@Max(value = 9999, groups = {SaveCheck.class}) //최대 9999 까지만 허용한다
     private Integer quantity;
 
     public Item() {
